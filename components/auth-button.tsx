@@ -1,15 +1,11 @@
+'use client'
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { LogoutButton } from "./logout-button";
+import { useAuth } from "@/hooks/queries/use-auth";
 
-export async function AuthButton() {
-  // const supabase = await createClient();
-
-  // const { data } = await supabase.auth.getClaims();
-
-  // const user = data?.claims;
-  // do logic with api routes
-  const user = { email: "" };
+export function AuthButton() {
+  const { user } = useAuth();
 
   return user ? (
     <div className="flex items-center gap-4">

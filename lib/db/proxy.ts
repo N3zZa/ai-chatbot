@@ -49,6 +49,6 @@ export async function updateSession(request: NextRequest) {
     url.pathname = "/chat";
     return NextResponse.redirect(url);
   }
-  
+
   return supabaseResponse;
 }

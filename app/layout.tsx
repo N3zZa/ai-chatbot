@@ -3,10 +3,8 @@ import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import { QueryProvider } from "@/components/providers/query-provider";
-
-const defaultUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "http://localhost:3000";
+import { defaultUrl } from "@/constants";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
@@ -37,6 +35,7 @@ export default function RootLayout({
           >
             {children}
           </ThemeProvider>
+          <Toaster />
         </QueryProvider>
       </body>
     </html>

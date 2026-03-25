@@ -1,18 +1,21 @@
+"use client";
 import { redirect } from "next/navigation";
-
 import { InfoIcon } from "lucide-react";
 import { Suspense } from "react";
+import { useAuth } from "@/hooks/queries/use-auth";
 
-async function UserDetails() {
-  // const supabase = await createClient();
-  // const { data, error } = await supabase.auth.getClaims();
+function UserDetails() {
+  const { user, isLoading, error } = useAuth();
 
-  // if (error || !data?.claims) {
-  //   redirect("/auth/login");
-  // }
+  if (isLoading)  {
+    return
+  }
+  
+  if (error || !user) {
+    redirect("/auth/login");
+  }
 
-  // return JSON.stringify(data.claims, null, 2);
-  return JSON.stringify({}, null, 2);
+  return JSON.stringify(user, null, 2);
 }
 
 export default function ProtectedPage() {
@@ -32,9 +35,6 @@ export default function ProtectedPage() {
             <UserDetails />
           </Suspense>
         </pre>
-      </div>
-      <div>
-        <h2 className="font-bold text-2xl mb-4">Next steps</h2>
       </div>
     </div>
   );

@@ -12,8 +12,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useAuth } from "@/hooks/queries/use-auth";
+import { useRouter } from "next/navigation";
 
 export function SignUpForm({
   className,
@@ -22,31 +23,28 @@ export function SignUpForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+
+  const [passwordError, setPasswordError] = useState<string | null>(null);
   const router = useRouter();
+
+  const { signUp, isSigningUp, error: authError } = useAuth();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    // const supabase = createClient();
-    setIsLoading(true);
-    setError(null);
 
     if (password !== repeatPassword) {
-      setError("Passwords do not match");
-      setIsLoading(false);
+      setPasswordError("Пароли не совпадают");
       return;
     }
+    setPasswordError(null);
 
-    try {
-      // do logic with api routes
-      router.push("/auth/sign-up-success");
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
-    } finally {
-      setIsLoading(false);
-    }
+    signUp(
+      { email, password },
+      { onSuccess: () => router.push("/auth/sign-up-success") },
+    );
   };
+
+  const displayError = passwordError || authError?.message;
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -93,9 +91,11 @@ export function SignUpForm({
                   onChange={(e) => setRepeatPassword(e.target.value)}
                 />
               </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Creating an account..." : "Sign up"}
+              {displayError && (
+                <p className="text-sm text-red-500">{displayError}</p>
+              )}
+              <Button type="submit" className="w-full" disabled={isSigningUp}>
+                {isSigningUp ? "Creating an account..." : "Sign up"}
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">
