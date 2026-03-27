@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { getServerUser } from "@/lib/auth";
-import { supabaseAdmin } from "@/lib/db/client";
+import { getServerUser } from "@/lib/db/auth";
 import { ANON_MSG_LIMIT } from "@/constants";
+import { getUserWithLimits } from "@/lib/db/users";
 
 export async function GET() {
   const user = await getServerUser();
@@ -14,19 +14,10 @@ export async function GET() {
     });
   }
 
-  const { data: dbUser } = await supabaseAdmin
-    .from("users")
-    .select("is_anonymous, free_messages_count")
-    .eq("id", user.id)
-    .single();
-
-    const isAnon = dbUser?.is_anonymous ?? true;
-    const count = dbUser?.free_messages_count ?? 0;
+  const limits = await getUserWithLimits(user.id);
 
   return NextResponse.json({
     user,
-    isAnonymous: isAnon,
-    remaining: isAnon ? Math.max(0, ANON_MSG_LIMIT - count) : 999,
-    canAsk: isAnon ? count < ANON_MSG_LIMIT : true,
+    ...limits,
   });
 }

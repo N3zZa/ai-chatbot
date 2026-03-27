@@ -1,5 +1,5 @@
-import { supabaseAdmin } from "@/lib/db/client"; // Твой админский клиент
-import { createClient } from "@/lib/db/server"; // Твой SSR клиент (Anon)
+import { createClient } from "@/lib/db/server";
+import { createUser } from "@/lib/db/users";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -14,22 +14,18 @@ export async function POST(req: Request) {
       emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/confirm`,
     },
   });
+  const user = authData.user;
 
-  if (authError)
+  if (authError) {
     return NextResponse.json({ error: authError.message }, { status: 400 });
-
-  if (authData.user) {
-    const { error: dbError } = await supabaseAdmin.from("users").insert([
-      {
-        id: authData.user.id,
-        email: authData.user.email,
-        is_anonymous: false,
-        free_messages_count: 0,
-      },
-    ]);
-
-    if (dbError) console.error("Error adding user:", dbError);
   }
 
-  return NextResponse.json({ message: "Confirmation email sent" });
+  if (user) {
+    if (!user.email) {
+      return NextResponse.json({ error: "Email is required" }, { status: 400 });
+    }
+    await createUser(user.id, user.email);
+  }
+
+  return NextResponse.json({ error: "Confirmation email sent" });
 }

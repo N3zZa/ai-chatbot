@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useAuth } from "@/hooks/queries/use-auth";
 
 export function UpdatePasswordForm({
   className,
@@ -20,21 +21,18 @@ export function UpdatePasswordForm({
 }: React.ComponentPropsWithoutRef<"div">) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const { updatePassword, isUpdatingPassword } = useAuth();
   const router = useRouter();
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     setError(null);
 
     try {
-      // do logic with api routes
-      router.push("/protected");
+      updatePassword(password);
+      router.push("/chat");
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -62,8 +60,12 @@ export function UpdatePasswordForm({
                 />
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Saving..." : "Save new password"}
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={isUpdatingPassword}
+              >
+                {isUpdatingPassword ? "Saving..." : "Save new password"}
               </Button>
             </div>
           </form>

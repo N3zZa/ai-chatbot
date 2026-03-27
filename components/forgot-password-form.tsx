@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useState } from "react";
+import { useAuth } from "@/hooks/queries/use-auth";
 
 export function ForgotPasswordForm({
   className,
@@ -21,22 +22,17 @@ export function ForgotPasswordForm({
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const {forgotPassword, isForgotingPassword} = useAuth()
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    setIsLoading(true);
     setError(null);
-
     try {
-      // do logic with api routes
+      forgotPassword(email)
       setSuccess(true);
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
-    } finally {
-      setIsLoading(false);
-    }
+    } 
   };
 
   return (
@@ -78,8 +74,12 @@ export function ForgotPasswordForm({
                   />
                 </div>
                 {error && <p className="text-sm text-red-500">{error}</p>}
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Sending..." : "Send reset email"}
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isForgotingPassword}
+                >
+                  {isForgotingPassword ? "Sending..." : "Send reset email"}
                 </Button>
               </div>
               <div className="mt-4 text-center text-sm">

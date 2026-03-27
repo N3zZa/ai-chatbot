@@ -31,7 +31,7 @@ export function LoginForm({
       { email, password },
       {
         onSuccess: () => {
-          router.push("/protected");
+          router.push("/chat");
         },
       },
     );

@@ -58,6 +58,11 @@ export function useAuth() {
     onSuccess: () => toast.success("Пароль успешно обновлен"),
   });
 
+  const forgotPasswordMutation = useMutation({
+    mutationFn: authService.forgotPassword,
+    onSuccess: () => toast.success("Пароль успешно обновлен"),
+  });
+
   return {
     user: data?.user ?? null,
     isAnonymous: !data?.user,
@@ -76,5 +81,9 @@ export function useAuth() {
     isLoggingOut: logoutMutation.isPending,
 
     updatePassword: updatePasswordMutation.mutate,
+    isUpdatingPassword: updatePasswordMutation.isPending,
+
+    forgotPassword: forgotPasswordMutation.mutate,
+    isForgotingPassword: forgotPasswordMutation.isPending,
   };
 }
