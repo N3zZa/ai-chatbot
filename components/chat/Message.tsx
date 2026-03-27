@@ -5,6 +5,7 @@ import Image from "next/image";
 import { UIMessage } from "ai";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { markdownComponents } from "../ui/markdown";
 
 interface MessageProps {
   message: UIMessage;
@@ -50,7 +51,10 @@ export function Message({ message }: MessageProps) {
                     key={part.type + "-" + i}
                     className="prose prose-sm dark:prose-invert max-w-none break-words leading-relaxed"
                   >
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    <ReactMarkdown
+                      components={markdownComponents}
+                      remarkPlugins={[remarkGfm]}
+                    >
                       {part.text}
                     </ReactMarkdown>
 

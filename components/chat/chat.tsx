@@ -2,18 +2,19 @@
 
 import { Message } from "./Message";
 import { ScrollArea } from "../ui/scroll-area";
-import { useEffect, useRef } from "react";
+import { use, useEffect, useRef } from "react";
 import { ChatInput } from "./chat-input";
 import { useMessages } from "@/hooks/queries/use-messages";
 import { useRouter, useSearchParams } from "next/navigation";
 
 type ChatProps = {
-  chatId: string;
+  params: Promise<{ chatId: string }>
 };
 
-export const Chat = ({ chatId }: ChatProps) => {
+export const Chat = ({ params }: ChatProps) => {
+  const { chatId } = use(params);
   const searchParams = useSearchParams();
-  const router = useRouter()
+  const router = useRouter();
   const {
     messages,
     input,
@@ -26,36 +27,46 @@ export const Chat = ({ chatId }: ChatProps) => {
   } = useMessages(chatId);
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    const container = scrollRef.current;
+    if (!container) return;
+
+    const size_close_down = 100;
+    const isScrolledToBottom =
+      container.scrollHeight - container.scrollTop - container.clientHeight <
+      size_close_down;
+
+    if (isScrolledToBottom) {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages]);
 
-   useEffect(() => {
-     const pendingMsg = searchParams.get("message");
-     if (pendingMsg && !isLoadingHistory && messages.length === 0) {
-       router.replace(`/chat/${chatId}`);
-       sendText(pendingMsg);
-     }
-   }, [
-     searchParams,
-     router,
-     chatId,
-     sendText,
-     isLoadingHistory,
-     messages.length,
-   ]);
+  useEffect(() => {
+    const pendingMsg = searchParams.get("message");
+    if (pendingMsg && !isLoadingHistory && messages.length === 0) {
+      router.replace(`/chat/${chatId}`);
+      sendText(pendingMsg);
+    }
+  }, [
+    searchParams,
+    router,
+    chatId,
+    sendText,
+    isLoadingHistory,
+    messages.length,
+  ]);
 
-   const handleSubmit = (e: React.FormEvent, files?: File[]) => {
-     e.preventDefault();
-     if (!input.trim() && (!files || files.length === 0)) return;
-     sendMessage(e, files);
-   };
-
+  const handleSubmit = (e: React.FormEvent, files?: File[]) => {
+    e.preventDefault();
+    if (!input.trim() && (!files || files.length === 0)) return;
+    sendMessage(e, files);
+  };
 
   return (
     <div className="flex flex-col flex-1 w-full overflow-hidden">
-      <ScrollArea className="flex-1">
+      <ScrollArea ref={scrollRef} className="flex-1">
         <div className="mx-auto w-full px-4 py-6 space-y-6 pb-20">
           {isLoadingHistory && (
             <div className="absolute top-1/2 left-1/2 tranform -translate-x-1/2 -translate-y-1/2">

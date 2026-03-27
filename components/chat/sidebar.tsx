@@ -13,9 +13,10 @@ import { useChats } from "@/hooks/queries/use-chats";
 import { useState } from "react";
 import { Chat } from "@/types/chat.types";
 
-export function Sidebar({ remaining }: { remaining: number }) {
+export function Sidebar() {
   const pathname = usePathname();
-  const { user } = useAuth();
+  const { user, remaining } = useAuth();
+
   const router = useRouter();
   const {
     chats,
@@ -34,7 +35,7 @@ export function Sidebar({ remaining }: { remaining: number }) {
   };
 
   const handleDeleteChat = async (chatId: string) => {
-    console.log(chatId)
+    console.log(chatId);
     await deleteChat(chatId);
     if (pathname === `/chat/${chatId}`) router.push("/chat");
   };
@@ -70,8 +71,8 @@ export function Sidebar({ remaining }: { remaining: number }) {
         </button>
       </div>
 
-      <ScrollArea className="flex-1 overflow-y-auto px-2">
-        <div className="space-y-1 max-w-full">
+      <ScrollArea className="max-w-68 overflow-y-auto px-2">
+        <div className="space-y-1 max-w-60">
           {chats.map((chat) => {
             const isActive = pathname === `/chat/${chat.id}`;
 
@@ -79,31 +80,33 @@ export function Sidebar({ remaining }: { remaining: number }) {
               <div
                 key={chat.id}
                 className={cn(
-                  "group relative flex items-center max-w-full justify-between rounded-md px-3 py-2 text-sm hover:bg-muted transition-colors",
+                  "group relative flex items-center justify-between rounded-md px-3 py-2 text-sm hover:bg-muted transition-colors",
                   isActive && "bg-muted",
                 )}
               >
-                {editingId === chat.id ? (
-                  <input
-                    autoFocus
-                    value={editTitle}
-                    onChange={(e) => setEditTitle(e.target.value)}
-                    onBlur={() => saveEdit(chat.id)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") saveEdit(chat.id);
-                      if (e.key === "Escape") setEditingId(null);
-                    }}
-                    className="flex-1 bg-transparent border-b border-primary focus:outline-none"
-                  />
-                ) : (
-                  <Link
-                    href={`/chat/${chat.id}`}
-                    className="truncate max-w-[100px]"
-                  >
-                    {chat.title}
-                  </Link>
-                )}
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex-1 min-w-0">
+                  {editingId === chat.id ? (
+                    <input
+                      autoFocus
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      onBlur={() => saveEdit(chat.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") saveEdit(chat.id);
+                        if (e.key === "Escape") setEditingId(null);
+                      }}
+                      className="w-full bg-transparent border-b border-primary focus:outline-none"
+                    />
+                  ) : (
+                    <Link
+                      href={`/chat/${chat.id}`}
+                      className="group-hover:block w-full truncate pr-2 text-left transition-all"
+                    >
+                      {chat.title}
+                    </Link>
+                  )}
+                </div>
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-2">
                   <button
                     onClick={() => startEdit(chat)}
                     className="p-1 hover:bg-muted-foreground/10 rounded"

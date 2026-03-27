@@ -1,23 +1,11 @@
-"use client";
-
 import { Header } from "@/components/header";
 import { Sidebar } from "@/components/chat/sidebar";
-import { useAuth } from "@/hooks/queries/use-auth";
 import { NewChatPlaceholder } from "@/components/chat/NewChatPlaceholder";
 
 export default function Page() {
-  const { remaining, isLoading: isAuthLoading } = useAuth();
-
-  if (isAuthLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        Loading...
-      </div>
-    );
-  }
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background">
-      <Sidebar remaining={remaining} />
+      <Sidebar />
 
       <main className="flex flex-1 flex-col overflow-hidden">
         <Header type="chat" />

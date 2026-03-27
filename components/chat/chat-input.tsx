@@ -37,14 +37,30 @@ export function ChatInput({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!value.trim() && files.length === 0) return;
-
-    console.log(e, files)
-
     onSend(e, files);
-
     setFiles([]);
     if (fileInputRef.current) fileInputRef.current.value = "";
     if (textareaRef.current) textareaRef.current.style.height = "auto";
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const items = e.clipboardData.items;
+
+    let hasImage = false;
+
+    for (const item of items) {
+      if (item.type.startsWith("image/")) {
+        const file = item.getAsFile();
+        if (file) {
+          setFiles((prev) => [...prev, file]);
+          hasImage = true;
+        }
+      }
+    }
+
+    if (hasImage) {
+      e.preventDefault();
+    }
   };
 
   const handleTextareaInput = (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -115,6 +131,7 @@ export function ChatInput({
             ref={textareaRef}
             value={value}
             onChange={handleTextareaInput}
+            onPaste={handlePaste}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
