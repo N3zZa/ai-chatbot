@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Message } from "@/types/chat.types";
 import { chatService } from "@/services/chats";
 import { chatKeys } from "./keys";
-import { DefaultChatTransport, UIMessage } from "ai";
+import { DefaultChatTransport, FileUIPart, UIMessage } from "ai";
 import { fileToBase64 } from "@/lib/utils";
 
 
@@ -71,7 +71,7 @@ export function useMessages(chatId: string) {
 
     if (!input.trim() && (!files || files.length === 0)) return;
 
-    let fileParts = undefined;
+    let fileParts: FileUIPart[] | undefined = undefined;
 
     if (files && files.length > 0) {
       fileParts = await Promise.all(

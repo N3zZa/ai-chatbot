@@ -54,44 +54,48 @@ export async function POST(
 
   await decrementFreeMessagesCount(user.id);
 
-  console.log(dbContent)
 
-  const aiMessages: ModelMessage[] = messages.map((msg: UIMessage) => {
+  const aiMessages = messages.map((msg: UIMessage) => {
     const contentParts = msg.parts
       .map((part) => {
-        if (part.type === "text")
+        if (part.type === "text") {
           return { type: "text" as const, text: part.text };
+        }
         if (part.type === "file") {
-          if (part.mediaType.startsWith("image/")) {
-            return { type: "image" as const, image: part.url };
+          let rawBase64 = part.url;
+
+          if (rawBase64.startsWith("data:")) {
+            const commaIndex = rawBase64.indexOf(",");
+            if (commaIndex !== -1) rawBase64 = rawBase64.slice(commaIndex + 1);
           }
+
+          if (
+            part.mediaType?.startsWith("image/") ||
+            part.mediaType === "application/pdf"
+          ) {
+            return {
+              type: "file" as const,
+              data: rawBase64,
+              mediaType: part.mediaType, 
+              filename: part.filename,
+            };
+          }
+
           return {
-            type: "file" as const,
-            data: part.url,
-            mimeType: part.mediaType,
+            type: "text" as const,
+            text: `[Файл ${part.filename}]`,
           };
         }
         return undefined;
       })
-      .filter(Boolean) as Array<{
-      type: "text" | "image" | "file";
-      [key: string]: any;
-    }>;
-
-    if (contentParts.length === 1 && contentParts[0].type === "text") {
-      return {
-        role: msg.role as "user" | "assistant" | "system",
-        content: contentParts[0].text,
-      };
-    }
+      .filter(Boolean);
 
     return {
-      role: msg.role as "user" | "assistant" | "system",
+      role: msg.role,
       content: contentParts,
     };
   });
 
-  console.log(aiMessages);
 
   const result = await streamText({
     model: google(AI_MODEL),
@@ -117,7 +121,8 @@ export async function POST(
       }
     },
     onError: (error) => {
-      console.log(error);
+      console.error(error)
+      console.log("error, last message content: ", aiMessages[aiMessages.length - 1].content)
     },
   });
 
