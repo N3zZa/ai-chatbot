@@ -1,9 +1,8 @@
 import { generateText, ModelMessage, UIMessage } from "ai";
-import {updateChatTitle } from "@/lib/db/chats";
+import { updateChatTitle } from "@/lib/db/queries/chats";
 
 import { AI_MODEL, google } from "@/lib/llm/config";
 import { ALLOWED_MIME_TYPES } from "@/constants";
-
 
 export const formatAIMessages = (messages: UIMessage[]): ModelMessage[] => {
   return messages.map((msg) => ({
@@ -37,7 +36,10 @@ export const formatAIMessages = (messages: UIMessage[]): ModelMessage[] => {
   })) as ModelMessage[];
 };
 
-export const generateChatTitle = async (chatId: string, messageText: string) => {
+export const generateChatTitle = async (
+  chatId: string,
+  messageText: string,
+) => {
   try {
     const { text: newTitle } = await generateText({
       model: google(AI_MODEL),

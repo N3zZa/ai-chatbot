@@ -5,6 +5,7 @@ import { authKeys } from "./keys";
 import { authService } from "@/services/auth";
 import { UserRequest, UserType } from "@/types/auth.types";
 import { ANON_MSG_LIMIT } from "@/constants";
+import { useEffect } from "react";
 
 export function useAuth() {
   const queryClient = useQueryClient();
@@ -20,8 +21,8 @@ export function useAuth() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: authKeys.user() });
     },
-    onError: () => {
-      console.log(error);
+    onError: (error) => {
+      console.error(error);
       toast.error("Неверный логин или пароль");
     },
   });
@@ -33,7 +34,7 @@ export function useAuth() {
       toast.success("Проверьте почту для подтверждения!");
     },
     onError: (error) => {
-      console.log(error);
+      console.error(error);
       toast.error("Ошибка при регистрации");
     },
   });
@@ -48,7 +49,7 @@ export function useAuth() {
       });
     },
     onError: (error) => {
-      console.log(error);
+      console.error(error);
       toast.error("Не удалось выйти из аккаунта");
     },
   });
@@ -56,12 +57,33 @@ export function useAuth() {
   const updatePasswordMutation = useMutation({
     mutationFn: authService.updatePassword,
     onSuccess: () => toast.success("Пароль успешно обновлен"),
+    onError: (error) => {
+      console.error(error);
+      toast.error("Не удалось обновить пароль");
+    },
   });
 
   const forgotPasswordMutation = useMutation({
     mutationFn: authService.forgotPassword,
     onSuccess: () => toast.success("Пароль успешно обновлен"),
+    onError: (error) => {
+      console.error(error);
+      toast.error("Не удалось обновить пароль");
+    },
   });
+
+  const signInAnonymouslyMutation = useMutation({
+    mutationFn: authService.signInAnonymously,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: authKeys.user() });
+    },
+  });
+
+  useEffect(() => {
+    if (!isLoading && !data?.user) {
+      signInAnonymouslyMutation.mutate();
+    }
+  }, [data?.user, isLoading]);
 
   return {
     user: data?.user ?? null,
@@ -85,5 +107,7 @@ export function useAuth() {
 
     forgotPassword: forgotPasswordMutation.mutate,
     isForgotingPassword: forgotPasswordMutation.isPending,
+
+    signInAnonymously: signInAnonymouslyMutation.mutate,
   };
 }

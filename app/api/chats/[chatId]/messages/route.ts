@@ -1,7 +1,7 @@
 import { getServerUser } from "@/lib/db/auth";
 import { NextResponse } from "next/server";
-import { getChatMessages } from "@/lib/db/messages";
-import { checkChatOwnership } from "@/lib/db/chats";
+import { getChatMessages } from "@/lib/db/queries/messages";
+import { checkChatOwnership } from "@/lib/db/queries/chats";
 
 export async function GET(
   req: Request,

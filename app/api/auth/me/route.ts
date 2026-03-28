@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerUser } from "@/lib/db/auth";
 import { ANON_MSG_LIMIT } from "@/constants";
-import { getUserWithLimits } from "@/lib/db/users";
+import { getUserWithLimits } from "@/lib/db/queries/users";
 
 export async function GET() {
   const user = await getServerUser();

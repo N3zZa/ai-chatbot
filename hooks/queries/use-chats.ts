@@ -4,8 +4,10 @@ import { toast } from "sonner";
 import { Chat } from "@/types/chat.types";
 import { chatService } from "@/services/chats";
 import { chatKeys } from "./keys";
+import { useEffect } from "react";
+import { supabaseRealtime } from "@/lib/db/client";
 
-export function useChats(initialChats?: Chat[]) {
+export function useChats(userId?: string, initialChats?: Chat[]) {
   const queryClient = useQueryClient();
 
   const {
@@ -16,7 +18,38 @@ export function useChats(initialChats?: Chat[]) {
     queryKey: chatKeys.lists(),
     queryFn: chatService.getChats,
     initialData: initialChats,
+    enabled: !!userId,
   });
+
+  useEffect(() => {
+    if (!userId) return;
+
+    const channel = supabaseRealtime
+      .channel(`sync-chats-${userId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "chats",
+          filter: `user_id=eq.${userId}`,
+        },
+        (payload) => {
+          // console.log("Change received", payload);
+          queryClient.invalidateQueries({ queryKey: chatKeys.lists() });
+          if (payload.eventType === "DELETE") {
+            queryClient.removeQueries({
+              queryKey: chatKeys.detail(payload.old.id),
+            });
+          }
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabaseRealtime.removeChannel(channel);
+    };
+  }, [userId, queryClient]);
 
   const createChatMutation = useMutation({
     mutationFn: ({ title }: { title?: string }) =>
@@ -26,7 +59,10 @@ export function useChats(initialChats?: Chat[]) {
       toast.success("Новый чат создан");
       return newChat;
     },
-    onError: () => toast.error("Не удалось создать чат"),
+    onError: (error) => {
+      console.error(error);
+      toast.error("Не удалось создать чат");
+    },
   });
 
   const deleteChatMutation = useMutation({
@@ -37,7 +73,7 @@ export function useChats(initialChats?: Chat[]) {
       toast.success("Чат удалён");
     },
     onError: (error) => {
-      console.log('error: ', error)
+      console.error(error);
       toast.error("Не удалось удалить чат");
     },
   });
@@ -48,14 +84,17 @@ export function useChats(initialChats?: Chat[]) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: chatKeys.lists() });
     },
-    onError: () => toast.error("Не удалось обновить название"),
+    onError: (error) => {
+      console.error(error);
+      toast.error("Не удалось обновить название");
+    },
   });
 
   return {
     chats: chats ?? [],
     isLoading,
     error,
-    
+
     createChat: createChatMutation.mutate,
     deleteChat: deleteChatMutation.mutate,
     updateChatTitle: updateTitleMutation.mutate,

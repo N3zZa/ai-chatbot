@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/db/server";
-import { createUser } from "@/lib/db/users";
+import { createUser } from "@/lib/db/queries/users";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {

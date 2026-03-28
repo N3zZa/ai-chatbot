@@ -5,13 +5,14 @@ import { useChat } from "@ai-sdk/react";
 import { toast } from "sonner";
 import { Message } from "@/types/chat.types";
 import { chatService } from "@/services/chats";
-import { chatKeys } from "./keys";
+import { authKeys, chatKeys } from "./keys";
 import { DefaultChatTransport, FileUIPart, UIMessage } from "ai";
 import { fileToBase64 } from "@/lib/utils";
-
+import { useRouter } from "next/navigation";
 
 export function useMessages(chatId: string) {
   const queryClient = useQueryClient();
+  const router = useRouter()
   const [input, setInput] = useState("");
 
   const { data: historyMessages, isLoading: isLoadingHistory } = useQuery<
@@ -40,18 +41,31 @@ export function useMessages(chatId: string) {
   } = useChat({
     transport: new DefaultChatTransport({ api: `/api/chats/${chatId}/chat` }),
     id: chatId,
-    onFinish: () =>
-      queryClient.invalidateQueries({ queryKey: chatKeys.lists() }),
-    onError: (error) =>
-      toast.error(error.message || "Ошибка при отправке сообщения"),
+    onFinish: () => {
+      queryClient.invalidateQueries({ queryKey: chatKeys.lists() })
+       queryClient.invalidateQueries({ queryKey: authKeys.user() });
+    },
+    onError: (error) => {
+      console.error(error);
+      if (error.message.includes("limit reached")) {
+        toast.error("Лимит бесплатных вопросов исчерпан", {
+          description: "Зарегистрируйтесь, чтобы продолжить общение",
+          action: {
+            label: "Sign Up",
+            onClick: () => router.push("/sign-up"),
+          },
+        });
+      } else {
+        toast.error(error.message || "Ошибка при отправке");
+      }
+    },
   });
 
   useEffect(() => {
     if (initialMessages.length > 0 && messages.length === 0) {
       setMessages(initialMessages as UIMessage[]);
     }
-  }, [initialMessages, setMessages, messages.length]); 
-
+  }, [initialMessages, setMessages, messages.length]);
 
   const handleSubmit = async (e: React.FormEvent, files?: File[]) => {
     e.preventDefault();
@@ -79,7 +93,7 @@ export function useMessages(chatId: string) {
   };
 
   const sendText = (text: string) => {
-    const trimmed = text.trim()
+    const trimmed = text.trim();
     if (trimmed) {
       sendMessage({ text: trimmed });
       setInput("");

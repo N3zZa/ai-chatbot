@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Plus, Settings, Edit2, Trash2 } from "lucide-react";
+import { Plus, Settings, Edit2, Trash2, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -15,8 +15,7 @@ import { Chat } from "@/types/chat.types";
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { user, remaining } = useAuth();
-
+  const { user, remaining, isLoading } = useAuth();
   const router = useRouter();
   const {
     chats,
@@ -24,7 +23,7 @@ export function Sidebar() {
     deleteChat,
     updateChatTitle,
     isCreatingChat,
-  } = useChats();
+  } = useChats(user?.id);
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
@@ -57,6 +56,8 @@ export function Sidebar() {
       content: <LogoutButton type="chat" />,
     },
   ];
+
+  const isAnonymous = user?.is_anonymous;
 
   return (
     <div className="w-64 h-full border-r bg-card flex flex-col">
@@ -128,15 +129,24 @@ export function Sidebar() {
 
       <div className="p-4 border-t space-y-4">
         <div className="bg-muted p-3 rounded-lg text-[12px]">
-          <p className="font-semibold">
-            Free messages: {remaining === 999 ? "Unlimited" : `${remaining}/3`}
-          </p>
-          <div className="w-full bg-secondary h-1.5 mt-2 rounded-full overflow-hidden">
-            <div
-              className="bg-primary h-full transition-all"
-              style={{ width: `${(remaining / 3) * 100}%` }}
-            />
-          </div>
+          {isLoading ? (
+            <Loader2 className="animate-spin mx-auto" />
+          ) : (
+            <>
+              <p className="font-semibold">
+                Free messages:{" "}
+                {remaining === 999 ? "Unlimited" : `${remaining}/3`}
+              </p>
+              <div className="w-full bg-background h-1.5 mt-2 rounded-full overflow-hidden">
+                <div
+                  className="bg-primary h-full transition-all"
+                  style={{
+                    width: `${remaining > 0 ? (remaining / 3) * 100 : 1}%`,
+                  }}
+                />
+              </div>
+            </>
+          )}
         </div>
 
         <div className="flex flex-col gap-1">
@@ -148,15 +158,15 @@ export function Sidebar() {
             </Avatar>
             <div className="flex flex-col min-w-0">
               <span className="text-sm font-medium truncate">
-                {user ? user.email : "Anonymous"}
+                {user && !isAnonymous ? user.email : "Anonymous"}
               </span>
-              {user && (
+              {!isAnonymous && (
                 <span className="text-[10px] text-muted-foreground truncate">
                   Free Plan
                 </span>
               )}
             </div>
-            {user ? (
+            {!isAnonymous ? (
               <UserDropdown
                 items={menuItems}
                 trigger={

@@ -8,7 +8,7 @@ import { useMessages } from "@/hooks/queries/use-messages";
 import { useRouter, useSearchParams } from "next/navigation";
 
 type ChatProps = {
-  params: Promise<{ chatId: string }>
+  params: Promise<{ chatId: string }>;
 };
 
 export const Chat = ({ params }: ChatProps) => {
@@ -57,7 +57,6 @@ export const Chat = ({ params }: ChatProps) => {
     isLoadingHistory,
     messages.length,
   ]);
-
 
   return (
     <div className="flex flex-col flex-1 w-full overflow-hidden">

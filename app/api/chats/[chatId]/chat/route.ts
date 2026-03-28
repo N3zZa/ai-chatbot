@@ -1,12 +1,12 @@
 import { streamText, UIMessage } from "ai";
 import { getServerUser } from "@/lib/db/auth";
 import { NextResponse } from "next/server";
-import { checkChatOwnership } from "@/lib/db/chats";
-import { addMessage } from "@/lib/db/messages";
+import { checkChatOwnership } from "@/lib/db/queries/chats";
+import { addMessage } from "@/lib/db/queries/messages";
 import {
   decrementFreeMessagesCount,
-  getRemainingFreeMessages,
-} from "@/lib/db/users";
+  getUserWithLimits,
+} from "@/lib/db/queries/users";
 import { AI_MODEL, google } from "@/lib/llm/config";
 import { formatAIMessages, generateChatTitle } from "@/lib/llm/utils";
 
@@ -28,9 +28,17 @@ export async function POST(
   if (!isOwner)
     return NextResponse.json({ error: "Chat not found" }, { status: 404 });
 
-  const remaining = await getRemainingFreeMessages(user.id);
-  if (remaining <= 0)
-    return NextResponse.json({ error: "Free limit reached" }, { status: 403 });
+  const { canAsk } = await getUserWithLimits(user.id);
+  console.log(canAsk)
+  if (!canAsk) {
+    return NextResponse.json(
+      {
+        error: "Free question limit reached. Please sign up to continue.",
+        isAnonymous: user.is_anonymous,
+      },
+      { status: 403 },
+    );
+  }
 
   const lastMessage: UIMessage = messages[messages.length - 1];
   const messageText =
@@ -41,8 +49,6 @@ export async function POST(
     return NextResponse.json({ error: "Empty message" }, { status: 400 });
 
   const dbContent = hasFiles ? `${messageText} [Вложение]`.trim() : messageText;
-  await decrementFreeMessagesCount(user.id);
-
 
   const result = await streamText({
     model: google(AI_MODEL),
@@ -55,6 +61,10 @@ export async function POST(
         return console.warn("AI returned empty response");
       if (["error", "other"].includes(event.finishReason))
         return console.error("Stream error");
+      
+      if (user.is_anonymous) {
+        await decrementFreeMessagesCount(user.id);
+      }
 
       await Promise.all([
         addMessage(chatId, "user", dbContent),

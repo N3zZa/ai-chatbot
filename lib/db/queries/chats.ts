@@ -1,5 +1,5 @@
 import { Chat } from "@/types/chat.types";
-import { supabaseAdmin } from "./client";
+import { supabaseAdmin } from "../admin";
 
 export async function getUserChats(userId: string): Promise<Chat[]> {
   const { data, error } = await supabaseAdmin
@@ -58,7 +58,7 @@ export async function deleteChat(chatId: string, userId: string) {
     .from("chats")
     .delete()
     .eq("id", chatId)
-    .eq("user_id", userId)
- 
+    .eq("user_id", userId);
+
   if (error) throw error;
 }

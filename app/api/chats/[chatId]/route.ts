@@ -4,7 +4,7 @@ import {
   checkChatOwnership,
   updateChatTitle,
   deleteChat,
-} from "@/lib/db/chats";
+} from "@/lib/db/queries/chats";
 
 export async function PATCH(
   req: Request,
@@ -29,7 +29,7 @@ export async function PATCH(
   try {
     await updateChatTitle(chatId, title);
 
-     return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
@@ -48,7 +48,7 @@ export async function DELETE(
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  
+
   try {
     await deleteChat(chatId, user.id);
     return NextResponse.json({ success: true });

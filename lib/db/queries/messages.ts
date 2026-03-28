@@ -1,5 +1,5 @@
 import { Message } from "@/types/chat.types";
-import { supabaseAdmin } from "./client";
+import { supabaseAdmin } from "../admin";
 
 export async function getChatMessages(chatId: string): Promise<Message[]> {
   const { data, error } = await supabaseAdmin

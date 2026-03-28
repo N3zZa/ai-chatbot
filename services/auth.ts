@@ -59,6 +59,16 @@ export const authService = {
     return res.json();
   },
 
+  async signInAnonymously() {
+    const res = await fetch("/api/auth/login-anonymously", {
+      method: "POST",
+    });
+
+    if (!res.ok) throw new Error("Failed to auth anonymously");
+
+    return res.json();
+  },
+
   async me() {
     const res = await fetch("/api/auth/me");
     if (!res.ok) return { user: null, canAsk: true, remaining: ANON_MSG_LIMIT };

@@ -5,6 +5,7 @@ import "./globals.css";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { defaultUrl } from "@/constants";
 import { Toaster } from "sonner";
+import { AuthInitializer } from "@/components/auth-initializer";
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
@@ -33,6 +34,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
+            <AuthInitializer/>
             {children}
           </ThemeProvider>
           <Toaster />
