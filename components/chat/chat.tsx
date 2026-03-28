@@ -58,11 +58,6 @@ export const Chat = ({ params }: ChatProps) => {
     messages.length,
   ]);
 
-  const handleSubmit = (e: React.FormEvent, files?: File[]) => {
-    e.preventDefault();
-    if (!input.trim() && (!files || files.length === 0)) return;
-    sendMessage(e, files);
-  };
 
   return (
     <div className="flex flex-col flex-1 w-full overflow-hidden">
@@ -79,9 +74,20 @@ export const Chat = ({ params }: ChatProps) => {
             </div>
           )}
 
-          {messages.map((msg) => (
-            <Message key={msg.id} message={msg} />
-          ))}
+          {messages.map((message, index) => {
+            const isCurrentlyStreaming =
+              message.role === "assistant" &&
+              index === messages.length - 1 &&
+              isLoading;
+
+            return (
+              <Message
+                key={message.id}
+                message={message}
+                isStreaming={isCurrentlyStreaming}
+              />
+            );
+          })}
 
           <div ref={bottomRef} />
         </div>
@@ -103,7 +109,7 @@ export const Chat = ({ params }: ChatProps) => {
         <ChatInput
           value={input}
           onChange={handleInputChange}
-          onSend={handleSubmit}
+          onSend={sendMessage}
           disabled={isLoading || isLoadingHistory}
         />
       </div>

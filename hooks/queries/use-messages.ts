@@ -23,18 +23,10 @@ export function useMessages(chatId: string) {
   });
 
   const initialMessages = useMemo(() => {
-    if (!historyMessages) return [];
-
-    return historyMessages.map((m) => ({
+    return (historyMessages || []).map((m) => ({
       id: m.id,
-      role: m.role,
-      parts: [
-        {
-          type: "text",
-          text: m.content,
-          state: "done",
-        },
-      ],
+      role: m.role as "user" | "assistant",
+      parts: [{ type: "text", text: m.content }],
     }));
   }, [historyMessages]);
 
@@ -46,50 +38,40 @@ export function useMessages(chatId: string) {
     stop,
     error: streamError,
   } = useChat({
-    transport: new DefaultChatTransport({
-      api: `/api/chats/${chatId}/chat`,
-    }),
+    transport: new DefaultChatTransport({ api: `/api/chats/${chatId}/chat` }),
     id: chatId,
-    onFinish: () => {
-      queryClient.invalidateQueries({ queryKey: chatKeys.lists() });
-    },
-    onError: (error) => {
-      console.log(error, error.message);
-      toast.error(error.message || "Ошибка при отправке сообщения");
-    },
+    onFinish: () =>
+      queryClient.invalidateQueries({ queryKey: chatKeys.lists() }),
+    onError: (error) =>
+      toast.error(error.message || "Ошибка при отправке сообщения"),
   });
 
   useEffect(() => {
     if (initialMessages.length > 0 && messages.length === 0) {
       setMessages(initialMessages as UIMessage[]);
     }
-  }, [initialMessages, setMessages]); 
+  }, [initialMessages, setMessages, messages.length]); 
 
 
   const handleSubmit = async (e: React.FormEvent, files?: File[]) => {
     e.preventDefault();
 
-    if (!input.trim() && (!files || files.length === 0)) return;
+    const text = input.trim();
+    if (!text && !files?.length) return;
 
-    let fileParts: FileUIPart[] | undefined = undefined;
-
-    if (files && files.length > 0) {
-      fileParts = await Promise.all(
-        files.map(async (file) => {
-          const base64 = await fileToBase64(file);
-
-          return {
+    const fileParts: FileUIPart[] | undefined = files?.length
+      ? await Promise.all(
+          files.map(async (file) => ({
             type: "file" as const,
-            url: base64,
+            url: await fileToBase64(file),
             mediaType: file.type,
             filename: file.name,
-          };
-        }),
-      );
-    }
+          })),
+        )
+      : undefined;
 
     sendMessage({
-      text: input.trim(),
+      text,
       files: fileParts,
     });
 
@@ -97,28 +79,23 @@ export function useMessages(chatId: string) {
   };
 
   const sendText = (text: string) => {
-    if (text.trim()) {
-      sendMessage({ text: text.trim() });
+    const trimmed = text.trim()
+    if (trimmed) {
+      sendMessage({ text: trimmed });
       setInput("");
     }
   };
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    setInput(e.target.value);
-  };
-
-  const isLoading = status === "submitted" || status === "streaming";
-
   return {
     messages,
-    isLoading,
+    isLoading: status === "submitted" || status === "streaming",
     isLoadingHistory,
     error: streamError,
     stop,
     input,
-    handleInputChange,
+    handleInputChange: (
+      e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    ) => setInput(e.target.value),
     sendMessage: handleSubmit,
     sendText,
   };

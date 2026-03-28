@@ -114,7 +114,7 @@ export function ChatInput({
             hidden
             ref={fileInputRef}
             onChange={handleFileChange}
-            accept="image/*,.pdf,.doc,.docx"
+            accept="image/*,.pdf,.docx,.txt,.md"
           />
 
           <Button

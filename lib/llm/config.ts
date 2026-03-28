@@ -7,4 +7,4 @@ export const google = createGoogleGenerativeAI({
   apiKey: process.env.GEMINIAI_API_KEY,
 });
 
-export const AI_MODEL = "gemini-flash-latest";
+export const AI_MODEL = "gemini-2.5-flash";

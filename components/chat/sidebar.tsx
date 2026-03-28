@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { LogoutButton } from "../logout-button";
-import { AvatarFallback, AvatarImage, Avatar } from "../ui/avatar";
+import { AvatarFallback, Avatar } from "../ui/avatar";
 import { UserDropdown } from "./user-dropdown";
 import { useAuth } from "@/hooks/queries/use-auth";
 import { useChats } from "@/hooks/queries/use-chats";
@@ -142,7 +142,6 @@ export function Sidebar() {
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-3 px-2 py-1">
             <Avatar size="default">
-              <AvatarImage />
               <AvatarFallback>
                 {user?.email ? user?.email[0].toUpperCase() : "A"}
               </AvatarFallback>
