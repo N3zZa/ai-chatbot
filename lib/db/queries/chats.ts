@@ -22,7 +22,7 @@ export async function createChat(
 ): Promise<Chat> {
   const { data, error } = await supabaseAdmin
     .from("chats")
-    .insert({ user_id: userId, title: title || "Новый чат" })
+    .insert({ user_id: userId, title: title || "New chat" })
     .select()
     .single();
 

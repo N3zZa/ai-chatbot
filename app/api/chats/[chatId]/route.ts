@@ -33,7 +33,7 @@ export async function PATCH(
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: "Internal Server Error [Update chat title]" },
       { status: 500 },
     );
   }
@@ -55,7 +55,7 @@ export async function DELETE(
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: "Internal Server Error [Delete chat]" },
       { status: 500 },
     );
   }

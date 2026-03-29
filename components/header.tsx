@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { AuthButton } from "./auth-button";
 import { cn } from "@/lib/utils";
 import { ThemeSwitcher } from "./theme-switcher";
+import { MobileSidebar } from "./chat/sidebar";
 
 export const Header = ({ type = "default" }: { type?: "chat" | "default" }) => {
   return (
@@ -14,13 +15,18 @@ export const Header = ({ type = "default" }: { type?: "chat" | "default" }) => {
     >
       <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
         <div className="flex gap-5 items-center font-semibold">
-          <Link href={"/"}>OpenAI ChatBot</Link>
+          {type === "chat" && (
+            <MobileSidebar />
+          )}
+          <Link href={"/"}>AI ChatBot</Link>
         </div>
         {type === "default" ? (
           <Suspense>
             <AuthButton />
           </Suspense>
-        ) : <ThemeSwitcher />}
+        ) : (
+          <ThemeSwitcher />
+        )}
       </div>
     </header>
   );

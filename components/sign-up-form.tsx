@@ -33,7 +33,7 @@ export function SignUpForm({
     e.preventDefault();
 
     if (password !== repeatPassword) {
-      setPasswordError("Пароли не совпадают");
+      setPasswordError("Passwords don't match");
       return;
     }
     setPasswordError(null);

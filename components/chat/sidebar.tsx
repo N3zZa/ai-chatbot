@@ -1,22 +1,69 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Plus, Settings, Edit2, Trash2, Loader2 } from "lucide-react";
+
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { Plus, Settings, Edit2, Trash2, Loader2, Menu } from "lucide-react";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+
 import { cn } from "@/lib/utils";
-import { LogoutButton } from "../logout-button";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
 import { AvatarFallback, Avatar } from "../ui/avatar";
+
+import { LogoutButton } from "../logout-button";
 import { UserDropdown } from "./user-dropdown";
 import { useAuth } from "@/hooks/queries/use-auth";
 import { useChats } from "@/hooks/queries/use-chats";
-import { useState } from "react";
 import { Chat } from "@/types/chat.types";
 
 export function Sidebar() {
+  return (
+    <aside className="hidden md:flex w-64 h-full border-r bg-card flex-col shrink-0">
+      <SidebarContent />
+    </aside>
+  );
+}
+
+export function MobileSidebar() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
+        <Button variant="ghost" size="icon" className="md:hidden shrink-0">
+          <Menu className="h-5 w-5" />
+        </Button>
+      </SheetTrigger>
+      <SheetContent showCloseButton={false} side="left" className="w-64 p-0">
+        <VisuallyHidden>
+          <SheetDescription />
+          <SheetTitle>Navigation menu</SheetTitle>
+        </VisuallyHidden>
+        <SidebarContent isMobile setOpen={setOpen} />
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+function SidebarContent({
+  isMobile,
+  setOpen,
+}: {
+  isMobile?: boolean;
+  setOpen?: (open: boolean) => void;
+}) {
   const pathname = usePathname();
-  const { user, remaining, isLoading } = useAuth();
   const router = useRouter();
+
+  const { user, remaining, isLoading } = useAuth();
   const {
     chats,
     createChatAsync,
@@ -30,11 +77,13 @@ export function Sidebar() {
 
   const handleCreateChat = async () => {
     const newChat = await createChatAsync({});
-    if (newChat) router.push(`/chat/${newChat.id}`);
+    if (newChat) {
+      router.push(`/chat/${newChat.id}`);
+      if (isMobile) setOpen?.(false);
+    }
   };
 
   const handleDeleteChat = async (chatId: string) => {
-    console.log(chatId);
     await deleteChat(chatId);
     if (pathname === `/chat/${chatId}`) router.push("/chat");
   };
@@ -45,9 +94,19 @@ export function Sidebar() {
   };
 
   const saveEdit = async (chatId: string) => {
-    if (editTitle.trim())
-      await updateChatTitle({ chatId, title: editTitle.trim() });
+    const trimmedTitle = editTitle.trim();
+    if (trimmedTitle) {
+      await updateChatTitle({ chatId, title: trimmedTitle });
+    }
     setEditingId(null);
+  };
+
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    chatId: string,
+  ) => {
+    if (e.key === "Enter") saveEdit(chatId);
+    if (e.key === "Escape") setEditingId(null);
   };
 
   const menuItems = [
@@ -60,7 +119,7 @@ export function Sidebar() {
   const isAnonymous = user?.is_anonymous;
 
   return (
-    <div className="w-64 h-full border-r bg-card flex flex-col">
+    <>
       <div className="p-4 border-b mb-4">
         <button
           onClick={handleCreateChat}
@@ -68,7 +127,7 @@ export function Sidebar() {
           className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
         >
           <Plus className="h-4 w-4" />
-          {isCreatingChat ? "Создание..." : "Новый чат"}
+          {isCreatingChat ? "Creating..." : "New chat"}
         </button>
       </div>
 
@@ -76,6 +135,7 @@ export function Sidebar() {
         <div className="space-y-1 max-w-60">
           {chats.map((chat) => {
             const isActive = pathname === `/chat/${chat.id}`;
+            const isEditing = editingId === chat.id;
 
             return (
               <div
@@ -86,36 +146,36 @@ export function Sidebar() {
                 )}
               >
                 <div className="flex-1 min-w-0">
-                  {editingId === chat.id ? (
+                  {isEditing ? (
                     <input
                       autoFocus
                       value={editTitle}
                       onChange={(e) => setEditTitle(e.target.value)}
                       onBlur={() => saveEdit(chat.id)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") saveEdit(chat.id);
-                        if (e.key === "Escape") setEditingId(null);
-                      }}
+                      onKeyDown={(e) => handleKeyDown(e, chat.id)}
                       className="w-full bg-transparent border-b border-primary focus:outline-none"
                     />
                   ) : (
                     <Link
                       href={`/chat/${chat.id}`}
-                      className="group-hover:block w-full truncate pr-2 text-left transition-all"
+                      onClick={() => isMobile && setOpen?.(false)}
+                      className="group-hover:block max-md:block w-full truncate pr-2 text-left transition-all"
                     >
                       {chat.title}
                     </Link>
                   )}
                 </div>
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-2">
+                <div className="flex items-center gap-1 opacity-0 max-md:opacity-100 group-hover:opacity-100 transition-opacity shrink-0 ml-2">
                   <button
                     onClick={() => startEdit(chat)}
+                    title="Edit"
                     className="p-1 hover:bg-muted-foreground/10 rounded"
                   >
                     <Edit2 className="h-3 w-3" />
                   </button>
                   <button
                     onClick={() => handleDeleteChat(chat.id)}
+                    title="Delete"
                     className="p-1 hover:bg-destructive/10 rounded text-destructive"
                   >
                     <Trash2 className="h-3 w-3" />
@@ -187,6 +247,6 @@ export function Sidebar() {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/queries/use-auth";
 export function AuthButton() {
   const { user } = useAuth();
 
-  return user ? (
+  return user && !user.is_anonymous ? (
     <div className="flex items-center gap-4">
       {user.email}
       <LogoutButton />

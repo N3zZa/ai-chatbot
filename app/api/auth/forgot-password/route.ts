@@ -1,3 +1,4 @@
+import { defaultUrl } from "@/constants";
 import { createClient } from "@/lib/db/server";
 
 export async function POST(req: Request) {
@@ -6,7 +7,7 @@ export async function POST(req: Request) {
   const supabase = await createClient();
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/confirm?next=/auth/update-password`,
+    redirectTo: `${defaultUrl}/auth/confirm?next=/auth/update-password`,
   });
 
   if (error) {

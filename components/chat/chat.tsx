@@ -69,7 +69,7 @@ export const Chat = ({ params }: ChatProps) => {
           )}
           {messages.length === 0 && !isLoadingHistory && (
             <div className="h-[50vh] flex items-center justify-center text-muted-foreground">
-              Начните диалог с AI ассистентом
+              Start a dialogue with the AI assistant
             </div>
           )}
 
@@ -100,7 +100,7 @@ export const Chat = ({ params }: ChatProps) => {
               className="text-xs flex items-center gap-2 px-3 py-1 border rounded-full hover:bg-muted transition-colors"
             >
               <div className="w-2 h-2 bg-red-500 rounded-sm" />
-              Остановить генерацию
+              Stop generating
             </button>
           </div>
         )}

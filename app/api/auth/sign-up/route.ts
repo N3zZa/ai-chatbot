@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/db/server";
 import { createUser } from "@/lib/db/queries/users";
 import { NextResponse } from "next/server";
+import { defaultUrl } from "@/constants";
 
 export async function POST(req: Request) {
   const { email, password } = await req.json();
@@ -11,7 +12,7 @@ export async function POST(req: Request) {
     email,
     password,
     options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/confirm`,
+      emailRedirectTo: `${defaultUrl}/api/auth/confirm`,
     },
   });
   const user = authData.user;

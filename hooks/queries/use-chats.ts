@@ -41,6 +41,9 @@ export function useChats(userId?: string, initialChats?: Chat[]) {
             queryClient.removeQueries({
               queryKey: chatKeys.detail(payload.old.id),
             });
+            queryClient.removeQueries({
+              queryKey: chatKeys.messages(payload.old.id),
+            });
           }
         },
       )
@@ -56,12 +59,12 @@ export function useChats(userId?: string, initialChats?: Chat[]) {
       chatService.createChat(title),
     onSuccess: (newChat) => {
       queryClient.invalidateQueries({ queryKey: chatKeys.lists() });
-      toast.success("Новый чат создан");
+      toast.success("New chat created");
       return newChat;
     },
     onError: (error) => {
       console.error(error);
-      toast.error("Не удалось создать чат");
+      toast.error("Couldn't create a chat");
     },
   });
 
@@ -70,11 +73,11 @@ export function useChats(userId?: string, initialChats?: Chat[]) {
     onSuccess: (_, chatId) => {
       queryClient.invalidateQueries({ queryKey: chatKeys.lists() });
       queryClient.removeQueries({ queryKey: chatKeys.messages(chatId) });
-      toast.success("Чат удалён");
+      toast.success("Chat deleted");
     },
     onError: (error) => {
       console.error(error);
-      toast.error("Не удалось удалить чат");
+      toast.error("Couldn't delete chat");
     },
   });
 
@@ -86,7 +89,7 @@ export function useChats(userId?: string, initialChats?: Chat[]) {
     },
     onError: (error) => {
       console.error(error);
-      toast.error("Не удалось обновить название");
+      toast.error("Couldn't update the name");
     },
   });
 

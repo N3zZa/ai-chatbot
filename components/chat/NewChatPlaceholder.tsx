@@ -22,7 +22,7 @@ export const NewChatPlaceholder = () => {
 
 
     if (!user) {
-      console.warn("Ожидание завершения авторизации...");
+      console.warn("Waiting for authorization to complete...");
       return;
     }
 
@@ -39,7 +39,7 @@ export const NewChatPlaceholder = () => {
   return (
     <div className="flex flex-col flex-1 w-full overflow-hidden">
       <div className="flex-1 flex items-center justify-center text-muted-foreground">
-        Начните диалог с AI ассистентом
+        Start a dialogue with the AI assistant
       </div>
       <div className="mx-auto w-full max-w-5xl px-4 py-4">
         <ChatInput

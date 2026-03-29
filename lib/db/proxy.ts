@@ -29,8 +29,11 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  const { data } = await supabase.auth.getClaims();
-  const user = data?.claims;
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const isAnonymous = user?.is_anonymous;
 
   const url = request.nextUrl.clone();
 
@@ -45,7 +48,7 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (user && isAuthPage) {
+  if (user && !isAnonymous && isAuthPage) {
     url.pathname = "/chat";
     return NextResponse.redirect(url);
   }

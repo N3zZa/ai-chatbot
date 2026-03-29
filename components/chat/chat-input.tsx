@@ -75,7 +75,7 @@ export function ChatInput({
   };
 
   return (
-    <div className="border-t bg-background px-4 py-3">
+    <div className="border-t bg-background px-0 md:px-4 py-3">
       <form onSubmit={handleSubmit} className="mx-auto w-full max-w-3xl">
         {files.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-3">
@@ -107,7 +107,7 @@ export function ChatInput({
             ))}
           </div>
         )}
-        <div className="flex items-center gap-2 rounded-2xl border bg-muted/40 px-3 py-2 focus-within:ring-1 ring-ring transition">
+        <div className="flex items-center gap-1 rounded-2xl border bg-muted/40 px-2 py-2 focus-within:ring-1 ring-ring transition">
           <input
             type="file"
             multiple
@@ -145,13 +145,14 @@ export function ChatInput({
               border-0
               bg-transparent
               resize-none
-              px-0
+              px-1
               py-2
               leading-6
               min-h-[36px]
               max-h-[200px]
               overflow-y-auto
               focus-visible:ring-0
+              max-md:text-sm
             "
           />
 

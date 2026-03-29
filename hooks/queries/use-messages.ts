@@ -48,15 +48,15 @@ export function useMessages(chatId: string) {
     onError: (error) => {
       console.error(error);
       if (error.message.includes("limit reached")) {
-        toast.error("Лимит бесплатных вопросов исчерпан", {
-          description: "Зарегистрируйтесь, чтобы продолжить общение",
+        toast.error("The limit of free questions has been exhausted", {
+          description: "Register to continue communication.",
           action: {
             label: "Sign Up",
             onClick: () => router.push("/sign-up"),
           },
         });
       } else {
-        toast.error(error.message || "Ошибка при отправке");
+        toast.error(error.message || "Error when sending");
       }
     },
   });

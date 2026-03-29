@@ -3,7 +3,7 @@
 A full-stack, ChatGPT-like interface built with Next.js. This project provides a seamless conversational AI experience with support for multimodal inputs (text, images, documents), anonymous usage limits, and real-time cross-tab synchronization.
 
 ## 🎥 Demo
-* **Live Deployment:** [Insert Vercel Link Here]
+* **Live Deployment:** [\[link\]](https://openai-chatbot-gamma.vercel.app)
 * **Video Presentation:** [Insert Loom/YouTube Link Here]
 
 ---
@@ -25,7 +25,7 @@ A full-stack, ChatGPT-like interface built with Next.js. This project provides a
 * **Framework:** Next.js (App Router)
 * **Client State & Data Fetching:** TanStack Query (`@tanstack/react-query`)
 * **AI Integration:** Vercel AI SDK (`ai/react`)
-* **Styling & UI:** Tailwind CSS, Shadcn UI, Lucide Icons, `react-markdown` (memoized for performance)
+* **Styling & UI:** Tailwind CSS, Shadcn UI, Lucide Icons, `react-markdown`
 * **Database & Auth:** PostgreSQL via Supabase
 * **Realtime:** Supabase Realtime channels
 
@@ -47,8 +47,8 @@ Strict separation of concerns is maintained throughout the application:
 
 ### 1. Clone the repository
 \`\`\`bash
-git clone https://github.com/yourusername/your-repo-name.git
-cd your-repo-name
+git clone https://github.com/N3zZa/ai-chatbot
+cd ai-chatbot
 \`\`\`
 
 ### 2. Install dependencies
@@ -76,7 +76,24 @@ GEMINIAI_API_KEY=your_gemini_api_key
 \`\`\`
 
 ### 4. Database Setup
-Execute the SQL schema located in `/supabase/migrations` (or wherever your schema is stored) in your Supabase SQL editor to create the necessary tables (`users`, `chats`, `messages`).
+Execute the SQL schema located in `/supabase/migrations` in your Supabase SQL editor to create the necessary tables (`users`, `chats`, `messages`).
+
+[paste schema img url]
+
+The schema includes:
+* **Tables:** `users`, `chats`, `messages`.
+* **RPC Function:** `decrement_free_messages` — a secure server-side function to handle anonymous rate limiting.
+
+**SQL for the function:**
+```sql
+create or replace function decrement_free_messages(user_id uuid)
+returns void as $$
+begin
+  update users
+  set free_messages_count = free_messages_count - 1
+  where id = user_id and is_anonymous = true and free_messages_count > 0;
+end;
+$$ language plpgsql;
 
 ### 5. Run the development server
 \`\`\`bash
@@ -88,14 +105,25 @@ Open [http://localhost:3000](http://localhost:3000) to view the application.
 
 ## 📡 API Endpoints Overview
 
-The application strictly adheres to RESTful conventions:
+The application follows RESTful principles and is divided into two main groups: Authentication and Chat Management.
 
-* \`GET /api/chats\` - Retrieve all chats for the authenticated user.
-* \`POST /api/chats\` - Create a new chat session.
-* \`GET /api/chats/:chatId/messages\` - Fetch message history for a specific chat.
-* \`PATCH /api/chats/:chatId\` - Update chat metadata (e.g., auto-generated title).
-* \`DELETE /api/chats/:chatId\` - Delete a chat and its messages.
-* \`POST /api/chats/:chatId/chat\` - Primary LLM interaction endpoint (handles streaming and limits).
+### 🔐 Authentication (`/api/auth/*`)
+* **`GET /me`** — Get the current authenticated user session.
+* **`POST /login`** — Authenticate existing user with email and password.
+* **`POST /login-anonymously`** — Create/sign-in to an anonymous session for instant access.
+* **`POST /sign-up`** — Register a new account.
+* **`POST /logout`** — Terminate the current session.
+* **`GET /confirm`** — Handle email confirmation links (Supabase Auth).
+* **`POST /forgot-password`** — Trigger password reset email.
+* **`POST /update-password`** — Set a new password after reset.
+
+### 💬 Chat Management (`/api/chats/*`)
+* **`GET /`** — List all chat sessions for the current user.
+* **`POST /`** — Initialize a new chat session (checks creation limits).
+* **`GET /[chatId]/messages`** — Retrieve full message history for a specific chat.
+* **`POST /[chatId]/chat`** — **Core AI Endpoint**. Handles multimodal message streaming, AI response generation, and anonymous message decrementing.
+* **`PATCH /[chatId]`** — Update chat metadata (e.g., manual or auto-generated titles).
+* **`DELETE /[chatId]`** — Securely remove a chat and all its associated messages (cascading).
 
 ---
 

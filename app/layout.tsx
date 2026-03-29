@@ -9,8 +9,8 @@ import { AuthInitializer } from "@/components/auth-initializer";
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "OpenAI Chatbot",
-  description: "OpenAI ChatBot created with Nextjs,supabase,tailwind,shadcn, tanstack-query",
+  title: "AI Chatbot",
+  description: "AI ChatBot created with Nextjs,supabase,tailwind,shadcn, tanstack-query",
 };
 
 const geistSans = Geist({

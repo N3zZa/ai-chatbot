@@ -15,7 +15,7 @@ export async function GET() {
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: "Internal Server Error [Get user chats]" },
       { status: 500 },
     );
   }
@@ -34,12 +34,12 @@ export async function POST() {
     if (!allowed) {
       return NextResponse.json({ error: "Limit exceeded" }, { status: 403 });
     }
-    const newChat = await createChat(user.id, "Новый чат");
+    const newChat = await createChat(user.id, "New chat");
     return NextResponse.json(newChat, { status: 201 });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: "Internal Server Error [Create chat]" },
       { status: 500 },
     );
   }

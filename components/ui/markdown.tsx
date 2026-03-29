@@ -21,22 +21,38 @@ const CodeBlock = memo(
     };
 
     return (
-      <div className="relative group my-2">
-        <span>{language}</span>
+      <div className="relative group my-2 w-full max-w-full rounded-md bg-[#1e1e1e] border border-gray-800">
+        <span className="absolute top-2 left-4 text-xs text-gray-400 font-sans z-10 select-none">
+          {language}
+        </span>
         <button
           onClick={handleCopy}
-          className="absolute right-2 top-2 p-1 rounded bg-gray-700 text-white opacity-0 group-hover:opacity-100 transition"
+          className="absolute right-2 top-2 p-1.5 rounded bg-gray-700/50 max-md:bg-gray-700 max-md:opacity-100 text-white opacity-0 group-hover:opacity-100 transition z-10 hover:bg-gray-700"
         >
           {copied ? <Check size={14} /> : <Copy size={14} />}
         </button>
-        <SyntaxHighlighter
-          language={language}
-          style={vscDarkPlus}
-          PreTag="div"
-          className="rounded-md text-sm"
-        >
-          {children.replace(/\n$/, "")}
-        </SyntaxHighlighter>
+
+        <div className="grid grid-cols-1 w-full">
+          {" "}
+          <div className="w-full overflow-x-auto rounded-md">
+            <SyntaxHighlighter
+              language={language}
+              style={vscDarkPlus}
+              PreTag="div"
+              className="text-sm !my-0 !mt-0 w-full"
+              customStyle={{
+                margin: 0,
+                padding: "2.5rem 1rem 1rem 1rem",
+                maxWidth: "100%",
+                width: "100%",
+                background: "transparent",
+                overflowX: "auto",
+              }}
+            >
+              {children.replace(/\n$/, "")}
+            </SyntaxHighlighter>
+          </div>
+        </div>
       </div>
     );
   },
@@ -56,10 +72,30 @@ export const markdownComponents: Components = {
       return <CodeBlock language={match[1]}>{codeString}</CodeBlock>;
     }
     return (
-      <code className={className} {...props}>
+      <code
+        className={`${className || ""} break-words whitespace-pre-wrap bg-muted px-1.5 py-0.5 rounded-md text-sm`}
+        {...props}
+      >
         {children}
       </code>
     );
+  },
+  table({ children }) {
+    return (
+      <div className="w-full overflow-x-auto my-4">
+        <table className="w-full border-collapse text-sm">{children}</table>
+      </div>
+    );
+  },
+  th({ children }) {
+    return (
+      <th className="border px-4 py-2 bg-muted/50 font-semibold text-left">
+        {children}
+      </th>
+    );
+  },
+  td({ children }) {
+    return <td className="border px-4 py-2">{children}</td>;
   },
   h1({ children }) {
     return <h1 className="text-2xl font-bold mt-6 mb-4">{children}</h1>;

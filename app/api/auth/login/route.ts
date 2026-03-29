@@ -13,7 +13,7 @@ export async function POST(req: Request) {
 
   if (error) {
     return NextResponse.json(
-      { error: "Неверный email или пароль" },
+      { error: "Invalid email or password" },
       { status: 401 },
     );
   }

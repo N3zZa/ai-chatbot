@@ -38,11 +38,11 @@ export const Message = memo(
     return (
       <div
         className={cn(
-          "w-full py-6",
+          "w-full py-6 overflow-hidden",
           isAssistant ? "bg-muted/50" : "bg-background",
         )}
       >
-        <div className="container max-w-4xl flex gap-4 mx-auto px-4">
+        <div className="container max-w-4xl flex gap-4 mx-auto px-4 min-w-0">
           <Avatar className="h-8 w-8 border shrink-0">
             {isAssistant ? (
               <>
@@ -57,7 +57,7 @@ export const Message = memo(
             )}
           </Avatar>
 
-          <div className="flex-1 space-y-3 overflow-hidden">
+          <div className="flex-1 space-y-3 overflow-hidden min-w-0">
             <p className="font-medium text-xs text-foreground/50 uppercase tracking-wider">
               {isAssistant ? "Assistant" : "You"}
             </p>
@@ -68,7 +68,7 @@ export const Message = memo(
                   return (
                     <div
                       key={`${part.type}-${i}`}
-                      className="text-sm max-w-none break-words leading-relaxed"
+                      className="text-sm max-w-none break-words leading-relaxed w-full min-w-0 overflow-hidden"
                     >
                       <MemoizedMarkdown content={part.text} />
 
@@ -112,7 +112,7 @@ export const Message = memo(
                       href={part.url}
                       className="flex items-center gap-2 p-2 border rounded-md text-sm hover:bg-muted"
                     >
-                      📎 {part.filename || "Файл"}
+                      📎 {part.filename || "File"}
                     </Link>
                   );
                 }

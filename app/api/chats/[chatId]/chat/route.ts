@@ -48,7 +48,9 @@ export async function POST(
   if (!messageText && !hasFiles)
     return NextResponse.json({ error: "Empty message" }, { status: 400 });
 
-  const dbContent = hasFiles ? `${messageText} [Вложение]`.trim() : messageText;
+  const dbContent = hasFiles
+    ? `${messageText} [Attachment]`.trim()
+    : messageText;
 
   const result = await streamText({
     model: google(AI_MODEL),

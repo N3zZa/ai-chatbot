@@ -1,5 +1,5 @@
 import { Header } from "@/components/header";
-import { Sidebar } from "@/components/chat/sidebar";
+import {  Sidebar } from "@/components/chat/sidebar";
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
 
@@ -21,7 +21,6 @@ export default async function ChatPage({
       <Suspense fallback={<div className="w-64 bg-background" />}>
         <Sidebar />
       </Suspense>
-
       <main className="flex flex-1 flex-col overflow-hidden">
         <Header type="chat" />
         <Suspense fallback={<div className="flex-1 bg-background" />}>

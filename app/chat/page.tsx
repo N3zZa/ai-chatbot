@@ -1,5 +1,5 @@
 import { Header } from "@/components/header";
-import { Sidebar } from "@/components/chat/sidebar";
+import {  Sidebar } from "@/components/chat/sidebar";
 import { NewChatPlaceholder } from "@/components/chat/NewChatPlaceholder";
 
 export default function Page() {
