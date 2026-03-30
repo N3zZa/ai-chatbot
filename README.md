@@ -3,8 +3,8 @@
 A full-stack, ChatGPT-like interface built with Next.js. This project provides a seamless conversational AI experience with support for multimodal inputs (text, images, documents), anonymous usage limits, and real-time cross-tab synchronization.
 
 ## 🎥 Demo
-* **Live Deployment:** [\[link\]](https://openai-chatbot-gamma.vercel.app)
-* **Video Presentation:** [Insert Loom/YouTube Link Here]
+* **Live Deployment:** https://openai-chatbot-gamma.vercel.app
+* **Video Presentation:** [[YouTube]](https://youtu.be/ovVATHnIbaE)
 
 ---
 
@@ -46,21 +46,21 @@ Strict separation of concerns is maintained throughout the application:
 * AI Provider API Key (e.g., Google Gemini)
 
 ### 1. Clone the repository
-\`\`\`bash
+```bash
 git clone https://github.com/N3zZa/ai-chatbot
 cd ai-chatbot
-\`\`\`
+```
 
 ### 2. Install dependencies
-\`\`\`bash
+```bash
 npm install
-\`\`\`
+```
 
 ### 3. Environment Variables
 Create a `.env.local` file in the root directory and configure the following variables. 
 > **Security Note:** Never expose the `SUPABASE_SERVICE_ROLE_KEY` or `AI_API_KEY` to the client.
 
-\`\`\`env
+```env
 # Next.js Public
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
@@ -73,7 +73,7 @@ SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 
 # LLM Provider
 GEMINIAI_API_KEY=your_gemini_api_key
-\`\`\`
+```
 
 ### 4. Database Setup
 Execute the SQL schema located in `/supabase/migrations` in your Supabase SQL editor to create the necessary tables (`users`, `chats`, `messages`).
@@ -94,11 +94,12 @@ begin
   where id = user_id and is_anonymous = true and free_messages_count > 0;
 end;
 $$ language plpgsql;
+```
 
 ### 5. Run the development server
-\`\`\`bash
+```bash
 npm run dev
-\`\`\`
+```
 Open [http://localhost:3000](http://localhost:3000) to view the application.
 
 ---
