@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useChats } from "@/hooks/queries/use-chats";
 import { ChatInput } from "./chat-input";
 import { useAuth } from "@/hooks/queries/use-auth";
+import { fileToBase64 } from "@/lib/utils";
 
 export const NewChatPlaceholder = () => {
   const router = useRouter();
@@ -15,11 +16,11 @@ export const NewChatPlaceholder = () => {
     setInput(e.target.value);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, files?: File[]) => {
     e.preventDefault();
     const text = input.trim();
-    if (!text) return;
 
+    if (!text && (!files || files.length === 0)) return;
 
     if (!user) {
       console.warn("Waiting for authorization to complete...");
@@ -28,6 +29,22 @@ export const NewChatPlaceholder = () => {
 
     try {
       const newChat = await createChatAsync({});
+
+      if (files && files.length > 0) {
+        const fileParts = await Promise.all(
+          files.map(async (file) => ({
+            type: "file" as const,
+            url: await fileToBase64(file),
+            mediaType: file.type,
+            filename: file.name,
+          })),
+        );
+        sessionStorage.setItem(
+          `pending_files_${newChat.id}`,
+          JSON.stringify(fileParts),
+        );
+      }
+
       router.push(`/chat/${newChat.id}?message=${encodeURIComponent(text)}`);
     } catch (error) {
       console.error("Failed to create chat", error);

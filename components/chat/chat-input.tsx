@@ -27,6 +27,7 @@ export function ChatInput({
     if (e.target.files) {
       const newFiles = Array.from(e.target.files);
       setFiles((prev) => [...prev, ...newFiles]);
+      e.target.value = "";
     }
   };
 

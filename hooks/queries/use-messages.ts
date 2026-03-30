@@ -52,7 +52,7 @@ export function useMessages(chatId: string) {
           description: "Register to continue communication.",
           action: {
             label: "Sign Up",
-            onClick: () => router.push("/sign-up"),
+            onClick: () => router.push("/auth/sign-up"),
           },
         });
       } else {
@@ -92,13 +92,17 @@ export function useMessages(chatId: string) {
     setInput("");
   };
 
-  const sendText = (text: string) => {
+  const sendInitialMessage = (text: string, fileParts?: FileUIPart[]) => {
     const trimmed = text.trim();
-    if (trimmed) {
-      sendMessage({ text: trimmed });
+    if (trimmed || (fileParts && fileParts.length > 0)) {
+      sendMessage({
+        text: trimmed,
+        files: fileParts,
+      });
       setInput("");
     }
   };
+
 
   return {
     messages,
@@ -111,6 +115,6 @@ export function useMessages(chatId: string) {
       e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     ) => setInput(e.target.value),
     sendMessage: handleSubmit,
-    sendText,
+    sendInitialMessage,
   };
 }

@@ -23,7 +23,7 @@ export const Chat = ({ params }: ChatProps) => {
     isLoadingHistory,
     stop,
     sendMessage,
-    sendText,
+    sendInitialMessage,
   } = useMessages(chatId);
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
@@ -34,6 +34,7 @@ export const Chat = ({ params }: ChatProps) => {
     if (!container) return;
 
     const size_close_down = 100;
+    
     const isScrolledToBottom =
       container.scrollHeight - container.scrollTop - container.clientHeight <
       size_close_down;
@@ -45,17 +46,34 @@ export const Chat = ({ params }: ChatProps) => {
 
   useEffect(() => {
     const pendingMsg = searchParams.get("message");
-    if (pendingMsg && !isLoadingHistory && messages.length === 0) {
-      router.replace(`/chat/${chatId}`);
-      sendText(pendingMsg);
+
+    if (!isLoadingHistory && messages.length === 0) {
+      const pendingFilesRaw = sessionStorage.getItem(`pending_files_${chatId}`);
+
+      if (pendingFilesRaw || pendingMsg) {
+        router.replace(`/chat/${chatId}`);
+
+        let fileParts = undefined;
+
+        if (pendingFilesRaw) {
+          try {
+            fileParts = JSON.parse(pendingFilesRaw);
+            sessionStorage.removeItem(`pending_files_${chatId}`);
+          } catch (e) {
+            console.error("Failed to parse pending files", e);
+          }
+        }
+
+        sendInitialMessage(pendingMsg || "", fileParts);
+      }
     }
   }, [
     searchParams,
     router,
     chatId,
-    sendText,
     isLoadingHistory,
     messages.length,
+    sendInitialMessage,
   ]);
 
   return (
