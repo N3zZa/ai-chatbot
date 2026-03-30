@@ -8,34 +8,6 @@ A full-stack, ChatGPT-like interface built with Next.js. This project provides a
 
 ---
 
-## ✨ Features
-
-* **Real-time LLM Streaming:** Smooth, token-by-token response generation using Vercel AI SDK and the Gemini API.
-* **Multimodal Chat:** Support for uploading and analyzing images, `.pdf`, `.docx`, and `.txt` files directly in the chat context.
-* **Anonymous & Authenticated Access:** * Anonymous users can ask up to 3 free questions before being prompted to sign up.
-  * Secure authentication via Supabase Auth.
-* **Persistent Chat History:** Chats are securely saved and can be renamed, accessed, or deleted via the sidebar.
-* **Cross-Tab Synchronization:** Instant updates across multiple browser tabs using Supabase Realtime.
-* **Polished UI/UX:** Responsive design built with Tailwind CSS and Shadcn UI, featuring loading skeletons, empty states, and smooth auto-scrolling animations.
-
----
-
-## 🛠 Tech Stack & Architecture
-
-* **Framework:** Next.js (App Router)
-* **Client State & Data Fetching:** TanStack Query (`@tanstack/react-query`)
-* **AI Integration:** Vercel AI SDK (`ai/react`)
-* **Styling & UI:** Tailwind CSS, Shadcn UI, Lucide Icons, `react-markdown`
-* **Database & Auth:** PostgreSQL via Supabase
-* **Realtime:** Supabase Realtime channels
-
-### 🏗 Architectural Principles
-Strict separation of concerns is maintained throughout the application:
-1. **Client Layer:** React components handle UI/UX and state. **Zero direct database calls** are made from the frontend or Server Components. All data is fetched via TanStack Query from the REST API.
-2. **REST API Layer:** Next.js Route Handlers (`/api/*`) manage business logic, validation, and AI model interactions.
-3. **Database Layer:** Supabase is accessed strictly server-side using the **Service Role Key** (bypassing RLS), ensuring secure, backend-only database transactions. The only exception is the Supabase Realtime client, which uses the public anon key strictly for listening to websocket events.
-
----
 
 ## 🚀 Getting Started
 
@@ -101,6 +73,36 @@ $$ language plpgsql;
 npm run dev
 ```
 Open [http://localhost:3000](http://localhost:3000) to view the application.
+
+---
+
+
+## ✨ Features
+
+* **Real-time LLM Streaming:** Smooth, token-by-token response generation using Vercel AI SDK and the Gemini API.
+* **Multimodal Chat:** Support for uploading and analyzing images, `.pdf`, `.docx`, and `.txt` files directly in the chat context.
+* **Anonymous & Authenticated Access:** * Anonymous users can ask up to 3 free questions before being prompted to sign up.
+  * Secure authentication via Supabase Auth.
+* **Persistent Chat History:** Chats are securely saved and can be renamed, accessed, or deleted via the sidebar.
+* **Cross-Tab Synchronization:** Instant updates across multiple browser tabs using Supabase Realtime.
+* **Polished UI/UX:** Responsive design built with Tailwind CSS and Shadcn UI, featuring loading skeletons, empty states, and smooth auto-scrolling animations.
+
+---
+
+## 🛠 Tech Stack & Architecture
+
+* **Framework:** Next.js (App Router)
+* **Client State & Data Fetching:** TanStack Query (`@tanstack/react-query`)
+* **AI Integration:** Vercel AI SDK (`ai/react`)
+* **Styling & UI:** Tailwind CSS, Shadcn UI, Lucide Icons, `react-markdown`
+* **Database & Auth:** PostgreSQL via Supabase
+* **Realtime:** Supabase Realtime channels
+
+### 🏗 Architectural Principles
+Strict separation of concerns is maintained throughout the application:
+1. **Client Layer:** React components handle UI/UX and state. **Zero direct database calls** are made from the frontend or Server Components. All data is fetched via TanStack Query from the REST API.
+2. **REST API Layer:** Next.js Route Handlers (`/api/*`) manage business logic, validation, and AI model interactions.
+3. **Database Layer:** Supabase is accessed strictly server-side using the **Service Role Key** (bypassing RLS), ensuring secure, backend-only database transactions. The only exception is the Supabase Realtime client, which uses the public anon key strictly for listening to websocket events.
 
 ---
 
