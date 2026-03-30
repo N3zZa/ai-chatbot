@@ -56,7 +56,7 @@ export const generateChatTitle = async (
     const { text: newTitle } = await generateText({
       model: google(AI_MODEL),
       system:
-        "You're a useful assistant. Your task is to briefly (3-5 words) summarize the essence of the user's request for the chat header. Don't use quotation marks.",
+        "You're a useful assistant. Your task is to briefly (3-5 words) summarize the essence of the user's request for the chat header. Don't use quotation marks. Use user language",
       prompt: messageText,
     });
     await updateChatTitle(chatId, newTitle.trim());

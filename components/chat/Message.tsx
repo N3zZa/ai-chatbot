@@ -42,7 +42,12 @@ export const Message = memo(
           isAssistant ? "bg-muted/50" : "bg-background",
         )}
       >
-        <div className="container max-w-4xl flex gap-4 mx-auto px-4 min-w-0">
+        <div
+          className={cn(
+            "container max-w-3xl flex gap-4 mx-auto px-4 min-w-0",
+            !isAssistant && "flex-row-reverse",
+          )}
+        >
           <Avatar className="h-8 w-8 border shrink-0">
             {isAssistant ? (
               <>
@@ -57,7 +62,12 @@ export const Message = memo(
             )}
           </Avatar>
 
-          <div className="flex-1 space-y-3 overflow-hidden min-w-0">
+          <div
+            className={cn(
+              "flex-1 space-y-3 overflow-hidden min-w-0",
+              !isAssistant && "text-end",
+            )}
+          >
             <p className="font-medium text-xs text-foreground/50 uppercase tracking-wider">
               {isAssistant ? "Assistant" : "You"}
             </p>
